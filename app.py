@@ -128,24 +128,30 @@ with g_market:
 
 with g_mm:
     st.markdown(_group_label("Market Maker"), unsafe_allow_html=True)
-    mms = st.columns(1)
-    mms[0].selectbox("Strategy", ["InventorySkew", "BinaryAware", "FullBookLP"], key="mm_strategy")
 
-    mmb = st.columns(5)
-    mmb[0].number_input("Levels/side", 1, 50, key="levels")
-    mmb[1].number_input("Level step (¢)", 1, 10, key="level_step")
-    mmb[2].number_input("Size mult", 0.2, 5.0, key="size_mult", step=0.2)
-    mmb[3].number_input("MM buffer", 200, 20000, key="buffer", step=200)
+    # Row 1: common to all strategies
+    mc1 = st.columns([2, 1, 1])
+    mc1[0].selectbox("Strategy", ["InventorySkew", "BinaryAware", "FullBookLP"], key="mm_strategy")
+    mc1[1].number_input("Levels/side", 1, 50, key="levels")
+    mc1[2].number_input("MM buffer", 200, 20000, key="buffer", step=200)
 
-    mm = st.columns(5)
-    mm[0].number_input("Spread (¢)", 2, 40, key="spread", step=2)
-    mm[1].number_input("Stop-quote ¢", 1, 20, key="no_quote_threshold")
-    mm[2].number_input("MM inf. est. %", 0, 100, key="mm_informed_est", step=5,
-                        help="BinaryAwareMM: MM's own estimate of informed-trader fraction.")
-    mm[3].number_input("Sigma (¢)", 1.0, 50.0, key="sigma", step=1.0,
-                        help="FullBookLP: Gaussian width — controls how fast size decreases further from fair.")
-    mm[4].number_input("Res. taper k", 0.0, 10.0, key="resolution_taper_k", step=0.5,
-                        help="FullBookLP: resolution taper aggressiveness (0 = no taper).")
+    # Row 2: strategy-specific
+    _strat = st.session_state.mm_strategy
+    if _strat in ("InventorySkew", "BinaryAware"):
+        mc2 = st.columns(5 if _strat == "BinaryAware" else 4)
+        mc2[0].number_input("Spread (¢)", 2, 40, key="spread", step=2)
+        mc2[1].number_input("Level step (¢)", 1, 10, key="level_step")
+        mc2[2].number_input("Size mult", 0.2, 5.0, key="size_mult", step=0.2)
+        mc2[3].number_input("Stop-quote ¢", 1, 20, key="no_quote_threshold")
+        if _strat == "BinaryAware":
+            mc2[4].number_input("MM inf. est. %", 0, 100, key="mm_informed_est", step=5,
+                                 help="MM's own estimate of informed-trader fraction.")
+    elif _strat == "FullBookLP":
+        mc2 = st.columns([1, 1, 3])
+        mc2[0].number_input("Sigma (¢)", 1.0, 50.0, key="sigma", step=1.0,
+                             help="Gaussian width — how fast size tapers off from fair.")
+        mc2[1].number_input("Res. taper k", 0.0, 10.0, key="resolution_taper_k", step=0.5,
+                             help="Taper aggressiveness near resolution (0 = no taper).")
 
 with g_actions:
     st.markdown(_group_label("Controls"), unsafe_allow_html=True)
