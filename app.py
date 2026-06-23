@@ -131,13 +131,13 @@ with g_mm:
     mms = st.columns(1)
     mms[0].selectbox("Strategy", ["InventorySkew", "BinaryAware", "FullBookLP"], key="mm_strategy")
 
-    mmb = st.columns(4)
+    mmb = st.columns(5)
     mmb[0].number_input("Levels/side", 1, 50, key="levels")
     mmb[1].number_input("Level step (¢)", 1, 10, key="level_step")
     mmb[2].number_input("Size mult", 0.2, 5.0, key="size_mult", step=0.2)
     mmb[3].number_input("MM buffer", 200, 20000, key="buffer", step=200)
 
-    mm = st.columns(4)
+    mm = st.columns(5)
     mm[0].number_input("Spread (¢)", 2, 40, key="spread", step=2)
     mm[1].number_input("Stop-quote ¢", 1, 20, key="no_quote_threshold")
     mm[2].number_input("MM inf. est. %", 0, 100, key="mm_informed_est", step=5,
